@@ -11,6 +11,7 @@ using namespace linalg::aliases;
 
 namespace cg
 {
+	//1234
 	template<typename T>
 	class resource
 	{
