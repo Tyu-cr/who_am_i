@@ -146,7 +146,7 @@ namespace cg
 		float diffuse_b;
 		float emissive_r;
 		float emissive_g;
-		float emmisive_b;
+		float emissive_b;
 	};
 
 }// namespace cg

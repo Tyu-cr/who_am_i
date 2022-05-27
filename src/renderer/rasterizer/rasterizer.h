@@ -16,7 +16,7 @@ namespace cg::renderer
 	class rasterizer
 	{
 	public:
-		constexpr static float FLT_MAX = 1.f;
+//		constexpr static float FLT_MAX = 1.f;
 		rasterizer(){};
 		~rasterizer(){};
 		void set_render_target(

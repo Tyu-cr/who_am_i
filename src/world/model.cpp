@@ -17,7 +17,7 @@ cg::world::model::~model() {}
 void cg::world::model::load_obj(const std::filesystem::path& model_path)
 {
 	tinyobj::ObjReaderConfig readerConfig;
-	readerConfig.mtl_search_path = model_paath.parent_path().string();
+	readerConfig.mtl_search_path = model_path.parent_path().string();
 	readerConfig.triangulate = true;
 
 	tinyobj::ObjReader reader;
@@ -128,14 +128,14 @@ void cg::world::model::load_obj(const std::filesystem::path& model_path)
 						vertex.nz = attrib.normals[3 * idx.normal_index + 2];
 					}
 
-					if (idx.textcoord_index < 0) {
+					if (idx.texcoord_index < 0) {
 						vertex.u = 0.f;
 						vertex.v = 0.f;
 					}
 					else
 					{
-						vertex.u = attrib.textcoords[2 * idx.textcoord_index];
-						vertex.v = attrib.textcoords[2 * idx.textcoord_index + 1];
+						vertex.u = attrib.texcoords[2 * idx.texcoord_index];
+						vertex.v = attrib.texcoords[2 * idx.texcoord_index + 1];
 					}
 
 					if (materials.size() > 0) {
