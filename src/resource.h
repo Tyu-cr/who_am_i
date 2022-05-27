@@ -103,6 +103,7 @@ namespace cg
 						out.r = std::clamp(static_cast<int>(255.f * color.r), 0, 255);
 						out.g = std::clamp(static_cast<int>(255.f * color.g), 0, 255);
 						out.b = std::clamp(static_cast<int>(255.f * color.b), 0, 255);
+						return out;
 		};
 		static unsigned_color from_float3(const float3& color)
 		{
@@ -111,6 +112,7 @@ namespace cg
 						out.r = static_cast<int>(preprocessed.x);
 						out.g = static_cast<int>(preprocessed.y);
 						out.b = static_cast<int>(preprocessed.z);
+						return out;
 		};
 		float3 to_float3() const
 		{
@@ -126,10 +128,25 @@ namespace cg
 		unsigned char b;
 	};
 
-
-	// TODO: Lab 1.03. Implement `cg::vertex` struct
 	struct vertex
 	{
+		float x;
+		float y;
+		float z;
+		float nx;
+		float ny;
+		float nz;
+		float u;
+		float v;
+		float ambient_r;
+		float ambient_g;
+		float ambient_b;
+		float diffuse_r;
+		float diffuse_g;
+		float diffuse_b;
+		float emissive_r;
+		float emissive_g;
+		float emmisive_b;
 	};
 
 }// namespace cg
