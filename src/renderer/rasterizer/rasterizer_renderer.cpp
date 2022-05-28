@@ -50,7 +50,7 @@ void cg::renderer::rasterization_renderer::render()
 				vertex_data.ambient_b
 		};
 	};
-	
+
 	for(size_t shape_id = 0; shape_id < model->get_index_buffers().size();
 		 shape_id++)
 	{
