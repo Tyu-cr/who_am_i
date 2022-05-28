@@ -30,7 +30,7 @@ namespace cg::renderer
 
 		void set_viewport(size_t in_width, size_t in_height);
 
-		void draw(size_t num_vertexes, size_t vertex_offest);
+		void draw(size_t num_vertexes, size_t vertex_offset);
 
 		std::function<std::pair<float4, VB>(float4 vertex, VB vertex_data)> vertex_shader;
 		std::function<cg::color(const VB& vertex_data, const float z)> pixel_shader;
@@ -56,7 +56,6 @@ namespace cg::renderer
 		if (in_render_target) {
 			render_target = in_render_target;
 		}
-		// TODO: Lab 1.06. Adjust set_render_target, and clear_render_target methods of cg::renderer::rasterizer class to consume a depth buffer
 		if (in_depth_buffer) {
 			depth_buffer = in_depth_buffer;
 		}
@@ -71,7 +70,6 @@ namespace cg::renderer
 				render_target->item(i) = in_clear_value;
 			}
 		}
-		// TODO: Lab 1.06. Adjust set_render_target, and clear_render_target methods of cg::renderer::rasterizer class to consume a depth buffer
 		if (depth_buffer) {
 			for (size_t i = 0; i < depth_buffer->get_number_of_elements(); i++) {
 				depth_buffer->item(i) = in_depth;
@@ -103,7 +101,6 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	inline void rasterizer<VB, RT>::draw(size_t num_vertexes, size_t vertex_offset)
 	{
-		// TODO: Lab 1.04. Add `IA` and `Vertex shader` stages to `draw` method of `cg::renderer::rasterizer`
 		size_t vertex_id = vertex_offset;
 		while (vertex_id < vertex_offset + num_vertexes)
 		{
@@ -129,14 +126,20 @@ namespace cg::renderer
 			}
 
 			float2 bounding_box_begin {
-					std::clamp(std::min(std::min(vertices[0].x, vertices[1].x, vertices[2].x)), 0.f, static_cast<float>(width - 1)),
-					std::clamp(std::min(std::min(vertices[0].y, vertices[1].y, vertices[2].y)), 0.f, static_cast<float>(height - 1)),
+					std::clamp(std::min(std::min(vertices[0].x, vertices[1].x), vertices[2].x), 0.f, static_cast<float>(width - 1)),
+					std::clamp(std::min(std::min(vertices[0].y, vertices[1].y), vertices[2].y), 0.f, static_cast<float>(height - 1))
 			};
 
 			float2 bounding_box_end {
-					std::clamp(std::max(std::max(vertices[0].x, vertices[1].x, vertices[2].x)), 0.f, static_cast<float>(width - 1)),
-					std::clamp(std::max(std::max(vertices[0].y, vertices[1].y, vertices[2].y)), 0.f, static_cast<float>(height - 1)),
+					std::clamp(std::max(std::max(vertices[0].x, vertices[1].x), vertices[2].x), 0.f, static_cast<float>(width - 1)),
+					std::clamp(std::max(std::max(vertices[0].y, vertices[1].y), vertices[2].y), 0.f, static_cast<float>(height - 1))
 			};
+
+			float edge = edge_function(
+					float2{vertices[0].x, vertices[0].y},
+					float2{vertices[1].x, vertices[1].y},
+					float2{vertices[2].x, vertices[2].y}
+			);
 
 			for (int x = static_cast<int>(bounding_box_begin.x); x <= static_cast<int>(bounding_box_end.x); x++) {
 				for (int y = static_cast<int>(bounding_box_begin.y); y <= static_cast<int>(bounding_box_end.y); y++) {
@@ -157,29 +160,37 @@ namespace cg::renderer
 							point
 					);
 					if (edge0 >= 0.f && edge1 >= 0.f && edge2 >= 0.f) {
-						auto pixel_result = pixel_shader(vertices[0], 0.f);
-						render_target->item(x, y) = RT::from_color(pixel_result);
+						float u = edge1 / edge;
+						float v = edge2 / edge;
+						float w = edge0 / edge;
+						float depth = u * vertices[0].z + v * vertices[1].z + w * vertices[2].z;
+						if (depth_test(depth, x, y)) {
+							auto pixel_result = pixel_shader(vertices[0], depth);
+							render_target->item(x, y) = RT::from_color(pixel_result);
+							if (depth_buffer) {
+								depth_buffer->item(x, y) = depth;
+							}
+						}
 					}
 				}
 			}
 		}
-		// TODO: Lab 1.05. Add `Rasterization` and `Pixel shader` stages to `draw` method of `cg::renderer::rasterizer`
-		// TODO: Lab 1.06. Add Depth test stage to draw method of cg::renderer::rasterizer
-		
 	}
 
 	template<typename VB, typename RT>
 	inline float
 	rasterizer<VB, RT>::edge_function(float2 a, float2 b, float2 c)
 	{
-		// TODO: Lab 1.05. Implement `cg::renderer::rasterizer::edge_function` method
 		return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
 	}
 
 	template<typename VB, typename RT>
 	inline bool rasterizer<VB, RT>::depth_test(float z, size_t x, size_t y)
 	{
-		// TODO: Lab 1.06. Implement depth_test function of cg::renderer::rasterizer class
+		if (!depth_buffer) {
+			return true;
+		}
+		return depth_buffer->item(x, y) > z;
 	}
 
 }// namespace cg::renderer
