@@ -114,6 +114,7 @@ namespace cg
 						out.r = static_cast<int>(preprocessed.x);
 						out.g = static_cast<int>(preprocessed.y);
 						out.b = static_cast<int>(preprocessed.z);
+						return out;
 		};
 		float3 to_float3() const
 		{

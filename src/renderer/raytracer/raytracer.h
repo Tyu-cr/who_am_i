@@ -272,7 +272,6 @@ namespace cg::renderer
 		}
 
 		return miss_shader(ray);
-		// TODO: Lab 2.05. Adjust trace_ray method of raytracer class to traverse the acceleration structure
 	}
 
 	template<typename VB, typename RT>
