@@ -54,16 +54,16 @@ namespace cg::renderer
 	inline triangle<VB>::triangle(
 			const VB& vertex_a, const VB& vertex_b, const VB& vertex_c)
 	{
-		a = float3(vertex_a.x, vertex_a.y, vertex_a.z);
-		b = float3(vertex_b.x, vertex_b.y, vertex_b.z);
-		c = float3(vertex_c.x, vertex_c.y, vertex_c.z);
+		a = float3{vertex_a.x, vertex_a.y, vertex_a.z};
+		b = float3{vertex_b.x, vertex_b.y, vertex_b.z};
+		c = float3{vertex_c.x, vertex_c.y, vertex_c.z};
 
 		ba = b - a;
 		ca = c - a;
 
-		na = float3(vertex_a.nx, vertex_a.ny, vertex_a.nz);
-		nb = float3(vertex_b.nx, vertex_b.ny, vertex_b.nz);
-		nc = float3(vertex_c.nx, vertex_c.ny, vertex_c.nz);
+		na = float3{vertex_a.nx, vertex_a.ny, vertex_a.nz};
+		nb = float3{vertex_b.nx, vertex_b.ny, vertex_b.nz};
+		nc = float3{vertex_c.nx, vertex_c.ny, vertex_c.nz};
 
 		ambient = {vertex_a.ambient_r, vertex_a.ambient_g, vertex_a.ambient_b};
 		diffuse = {vertex_a.diffuse_r, vertex_a.diffuse_g, vertex_a.diffuse_b};
@@ -245,9 +245,9 @@ namespace cg::renderer
 			{
 				continue;
 			}
-			for (auto& triangle: triangles)
+			for (auto& triangle: aabb.get_triangles())
 			{
-				payload payload= intersection_shader(triangle, ray);
+				payload payload = intersection_shader(triangle, ray);
 				if (payload.t > min_t && payload.t < closest_hit_payload.t)
 				{
 					closest_hit_payload = payload;
@@ -257,8 +257,7 @@ namespace cg::renderer
 					{
 						return any_hit_shader(ray, payload, triangle);
 					}
-				}
-			}
+				}}
 		}
 
 		if (closest_hit_payload.t < max_t)
@@ -267,8 +266,6 @@ namespace cg::renderer
 			{
 				return closest_hit_shader(ray, closest_hit_payload, *closest_triangle, depth);
 			}
-
-			return miss_shader(ray);
 		}
 
 		return miss_shader(ray);
