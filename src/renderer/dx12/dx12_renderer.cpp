@@ -309,5 +309,5 @@ D3D12_GPU_DESCRIPTOR_HANDLE cg::renderer::descriptor_heap::get_gpu_descriptor_ha
 }
 ID3D12DescriptorHeap* cg::renderer::descriptor_heap::get() const
 {
-	retunr heap.Get();
+	return heap.Get();
 }
