@@ -139,12 +139,24 @@ void cg::renderer::dx12_renderer::create_depth_buffer()
 
 void cg::renderer::dx12_renderer::create_command_allocators()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
+	for (auto& command_allocator : command_allocators)
+	{
+		THROW_IF_FAILED(device->CreateCommandAllocator(
+				D3D12_COMMAND_LIST_TYPE_DIRECT,
+				IID_PPV_ARGS(&command_allocator)
+				));
+	}
 }
 
 void cg::renderer::dx12_renderer::create_command_list()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
+	THROW_IF_FAILED(device->CreateCommandList(
+			0,
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			command_allocators[0].Get(),
+			pipeline_state.Get(),
+			IID_PPV_ARGS(&command_list)
+			));
 }
 
 
@@ -262,7 +274,7 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"COLOR", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+			{"COLOR", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"COLOR", 2, DXGI_FORMAT_R32G32B32_FLOAT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 
@@ -279,7 +291,7 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 	pso_desc.DepthStencilState.StencilEnable = FALSE;
 	pso_desc.SampleMask = UINT_MAX;
 	pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	pso_desc.NumRenderTarget = 1;
+	pso_desc.NumRenderTargets = 1;
 	pso_desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	pso_desc.SampleDesc.Count = 1;
 
@@ -355,6 +367,12 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 
 void cg::renderer::dx12_renderer::load_assets()
 {
+	create_root_signature(nullptr, 0);
+	create_pso("shaders.hlsl");
+	create_command_allocators();
+	create_command_list();
+	command_list->Close();
+
 	vertex_buffers.resize(model->get_vertex_buffers().size());
 	vertex_buffer_views.resize(model->get_vertex_buffers().size());
 	index_buffers.resize(model->get_index_buffers().size());
