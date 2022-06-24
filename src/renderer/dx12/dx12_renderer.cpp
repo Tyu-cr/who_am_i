@@ -237,6 +237,7 @@ void cg::renderer::dx12_renderer::create_shader_resource_view(const ComPtr<ID3D1
 void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D12Resource>& buffer, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handler)
 {
 	// TODO Lab 3.04. Create a constant buffer view
+
 }
 
 void cg::renderer::dx12_renderer::load_assets()
@@ -270,7 +271,12 @@ void cg::renderer::dx12_renderer::load_assets()
 	copy_data(&cb, sizeof(cb), constant_buffer);
 	CD3DX12_RANGE read_range(0, 0);
 	THROW_IF_FAILED(constant_buffer->Map(0, &read_range, reinterpret_cast<void**>(&constant_buffer_data_begin)));
-	// TODO Lab 3.04. Create a descriptor heap for a constant buffer
+	cbv_srv_heap.create_heap(
+			device,
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			1,
+			D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
+			);
 	// TODO Lab 3.04. Create a constant buffer view
 }
 
